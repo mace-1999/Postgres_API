@@ -2,7 +2,7 @@ import unittest
 
 import pandas as pd
 
-from app.db_connection import connect_to_db, open_and_return_csv
+from app.db_connection import connect_to_db, open_and_return_csv, create_table_sql_from_postgres
 from psycopg2 import OperationalError
 from unittest.mock import patch
 
@@ -49,6 +49,11 @@ class TestConnector(unittest.TestCase):
         '''
         Test the compiling of the create table sql string
         '''
+        test_df = {'One': [1,2,3], 'Two' : [4,5,6]}
+        df = pd.DataFrame(test_df)
+        sql_string = create_table_sql_from_postgres(df, 'testdf')
+
+        self.assertEqual(sql_string, 'CREATE TABLE testdf ( One varchar,Two varchar);')
 
 
 

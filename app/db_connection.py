@@ -40,10 +40,10 @@ def create_table_sql_from_postgres(dataframe: pd.DataFrame, name: str) -> str:
 
     sql_string = f'CREATE TABLE {name} ( '
     for idx, i in enumerate(cols):
-        if idx != len(cols):
-            sql_string += f'\n{i} varchar,'
+        if (idx + 1) != len(cols):
+            sql_string += f'{i} varchar,'
         else:
-            sql_string += f'\n{i} varchar'
+            sql_string += f'{i} varchar'
 
     sql_string += ');'
 
