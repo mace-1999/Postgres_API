@@ -3,7 +3,7 @@ from psycopg2 import OperationalError
 import pandas as pd
 
 
-def connect_to_db(dbname, user, password, host, port):
+def connect_to_db(dbname, user, password, host, port) -> psycopg2.connect:
     '''
     attempt 5 db connections otherwise fail.
     :param dbname:
@@ -48,3 +48,4 @@ def create_table_sql_from_postgres(dataframe: pd.DataFrame, name: str) -> str:
     sql_string += ');'
 
     return sql_string
+
