@@ -84,6 +84,16 @@ class TestConnector(unittest.TestCase):
         self.assertEqual(len(dfs_returned[2]), 3)
         self.assertEqual(len(dfs_returned[3]), 1)
 
+    def test_df_below_four(self):
+        '''
+        If df is below four then return one list of df with the rest of the vals being False.
+        '''
+        test_df = {'One': [1,2,4], 'Two': [4,2,2]}
+        df = pd.DataFrame(test_df)
+        returned_list = split_df_into_four(df)
+        self.assertEqual(returned_list, [df])
+
+
 
 
 if __name__ == '__main__':

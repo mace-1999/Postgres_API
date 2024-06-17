@@ -1,6 +1,7 @@
 import psycopg2
 from psycopg2 import OperationalError
 import pandas as pd
+from decimal import Decimal, ROUND_HALF_UP
 
 
 def connect_to_db(dbname, user, password, host, port) -> psycopg2.connect:
@@ -49,8 +50,27 @@ def create_table_sql_from_postgres(dataframe: pd.DataFrame, name: str) -> str:
 
     return sql_string
 
-def split_df_into_four(df : pd.DataFrame):
+
+def split_df_into_four(df: pd.DataFrame) -> list:
     '''
     Split the df into four equal lengths - last length shall be however many to get to four.
     '''
-    pass
+
+    # return input as list if df is less than four.
+    if len(df) < 4:
+        return [df]
+
+    length_of_df_divide_four = len(df) / 4
+
+    # incr_length is length of df divide rounded of 4.
+    incr_length = int(Decimal(length_of_df_divide_four).to_integral_value(rounding=ROUND_HALF_UP))
+    list_of_dfs = []
+    offset = 0
+    # loop three times
+    for i in range(0, 3):
+        list_of_dfs.append(df[offset: offset + incr_length])
+        offset += incr_length
+
+    list_of_dfs.append(df[offset:])
+
+    return list_of_dfs
