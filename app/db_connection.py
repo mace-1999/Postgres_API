@@ -49,3 +49,8 @@ def create_table_sql_from_postgres(dataframe: pd.DataFrame, name: str) -> str:
 
     return sql_string
 
+def split_df_into_four(df : pd.DataFrame):
+    '''
+    Split the df into four equal lengths - last length shall be however many to get to four.
+    '''
+    pass

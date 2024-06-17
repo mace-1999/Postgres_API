@@ -2,7 +2,8 @@ import unittest
 
 import pandas as pd
 
-from app.db_connection import connect_to_db, open_and_return_csv, create_table_sql_from_postgres
+from app.db_connection import connect_to_db, open_and_return_csv, \
+    create_table_sql_from_postgres, split_df_into_four
 from psycopg2 import OperationalError
 from unittest.mock import patch
 
@@ -54,6 +55,34 @@ class TestConnector(unittest.TestCase):
         sql_string = create_table_sql_from_postgres(df, 'testdf')
 
         self.assertEqual(sql_string, 'CREATE TABLE testdf ( One varchar,Two varchar);')
+
+    def test_split_db_into_four(self):
+        '''
+        Confirm function returns four equal dataframes if multiple of four
+        '''
+        test_df = {'One': [1, 2, 3,4], 'Two': [4, 5, 6,7]}
+        df = pd.DataFrame(test_df)
+        dfs_returned = split_df_into_four(df)
+
+        self.assertEqual(len(dfs_returned), 4)
+        self.assertEqual(len(dfs_returned[0]), 1)
+        self.assertEqual(len(dfs_returned[1]), 1)
+        self.assertEqual(len(dfs_returned[2]), 1)
+        self.assertEqual(len(dfs_returned[3]), 1)
+
+
+    def test_last_df_makes_up_to_four(self):
+        '''
+        If df not multiple of four - fourth dataframe shall be the remainder.
+        '''
+        test_df = {'One': [1, 2, 3, 4,5,6,7,8,9,10], 'Two': [4, 5, 6, 7,1,1,1,2,3,4]}
+        df = pd.DataFrame(test_df)
+        dfs_returned = split_df_into_four(df)
+        self.assertEqual(len(dfs_returned), 4)
+        self.assertEqual(len(dfs_returned[0]), 3)
+        self.assertEqual(len(dfs_returned[1]), 3)
+        self.assertEqual(len(dfs_returned[2]), 3)
+        self.assertEqual(len(dfs_returned[3]), 1)
 
 
 
