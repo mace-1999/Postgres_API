@@ -1,11 +1,13 @@
 import unittest
 
 import pandas as pd
+import psycopg2
 
+import app.db_connection
 from app.db_connection import connect_to_db, open_and_return_csv, \
-    create_table_sql_from_postgres, split_df_into_four
-from psycopg2 import OperationalError
-from unittest.mock import patch
+    create_table_sql_from_postgres, split_df_into_four, execute_values
+from psycopg2 import OperationalError, DatabaseError, connect
+from unittest.mock import patch, MagicMock
 
 
 class TestConnector(unittest.TestCase):
@@ -40,17 +42,16 @@ class TestConnector(unittest.TestCase):
         '''
         Test opening csv returns correctly
         '''
-        test_df = {'One': [1,2,3], 'Two' : [4,5,6]}
+        test_df = {'One': [1, 2, 3], 'Two': [4, 5, 6]}
         patched_mock.read_csv.return_value = pd.DataFrame(test_df)
         df = open_and_return_csv('random_test')
         self.assertEqual(len(df), 3)
-
 
     def test_creating_table_sql(self):
         '''
         Test the compiling of the create table sql string
         '''
-        test_df = {'One': [1,2,3], 'Two' : [4,5,6]}
+        test_df = {'One': [1, 2, 3], 'Two': [4, 5, 6]}
         df = pd.DataFrame(test_df)
         sql_string = create_table_sql_from_postgres(df, 'testdf')
 
@@ -60,7 +61,7 @@ class TestConnector(unittest.TestCase):
         '''
         Confirm function returns four equal dataframes if multiple of four
         '''
-        test_df = {'One': [1, 2, 3,4], 'Two': [4, 5, 6,7]}
+        test_df = {'One': [1, 2, 3, 4], 'Two': [4, 5, 6, 7]}
         df = pd.DataFrame(test_df)
         dfs_returned = split_df_into_four(df)
 
@@ -70,12 +71,11 @@ class TestConnector(unittest.TestCase):
         self.assertEqual(len(dfs_returned[2]), 1)
         self.assertEqual(len(dfs_returned[3]), 1)
 
-
     def test_last_df_makes_up_to_four(self):
         '''
         If df not multiple of four - fourth dataframe shall be the remainder.
         '''
-        test_df = {'One': [1, 2, 3, 4,5,6,7,8,9,10], 'Two': [4, 5, 6, 7,1,1,1,2,3,4]}
+        test_df = {'One': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 'Two': [4, 5, 6, 7, 1, 1, 1, 2, 3, 4]}
         df = pd.DataFrame(test_df)
         dfs_returned = split_df_into_four(df)
         self.assertEqual(len(dfs_returned), 4)
@@ -88,11 +88,27 @@ class TestConnector(unittest.TestCase):
         '''
         If df is below four then return one list of df with the rest of the vals being False.
         '''
-        test_df = {'One': [1,2,4], 'Two': [4,2,2]}
+        test_df = {'One': [1, 2, 4], 'Two': [4, 2, 2]}
         df = pd.DataFrame(test_df)
         returned_list = split_df_into_four(df)
         self.assertEqual(returned_list, [df])
 
+    @patch('app.db_connection.connect_to_db')
+    @patch('app.db_connection.extras')
+    def test_postgres_insert_error(self , mock_extras, mock_connect):
+        '''
+        Test postgres insert statement
+        '''
+
+        mock_extras.execute_values.return_value = 'None'
+        mock_connect.return_value = MagicMock()
+        mock_connect.return_value.commit.side_effect = DatabaseError('Mock Error!')
+
+
+
+
+        res = execute_values('dbname', 'user', 'password', 'host', 'port', pd.DataFrame({'One': [1, 2, 3, 4], 'Two': [4, 5, 6, 7]}), 'test')
+        self.assertEqual(res, False)
 
 
 
