@@ -79,9 +79,7 @@ def split_df_into_four(df: pd.DataFrame) -> list:
 def execute_values(dbname, user, password, host, port, df, table):
 
     conn = connect_to_db(dbname, user, password, host, port)
-    print(conn)
     tuples = [tuple(row) for row in df.itertuples(index=False)]
-    print(tuples)
     cols = ','.join(list(df.columns))
     # SQL query to execute
     query = "INSERT INTO %s(%s) VALUES %%s" % (table, cols)

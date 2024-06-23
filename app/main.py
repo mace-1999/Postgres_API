@@ -11,15 +11,22 @@ USER = 'devuser'
 PASSWORD = 'changeme'
 SERVER = 'localhost'
 PORT = '5432'
+# FILE PATH OF CSV TO BE INSERTED TO POSTGRES
+FILEPATH = '../new_file.csv'
+# NAME TO CALL THE TABLE IN POSTGRES
+TABLE_NAME = 'new_file'
 
-# TODO: psycopg2.errors.DuplicateTable: relation "test" already exists
+
+# TODO: psycopg2.errors.DuplicateTable: relation "test" already exists.
+# TODO: Update so db config is more dynamic.
+# TODO: create read functionality.
 
 def main():
     conn = connect_to_db(DB, USER, PASSWORD, SERVER, PORT)
 
     # create table
-    df = pd.read_csv('../MOCK_DATA.csv')
-    sql_string = create_table_sql_from_postgres(df, 'MOCKDATA')
+    df = pd.read_csv(FILEPATH)
+    sql_string = create_table_sql_from_postgres(df, TABLE_NAME)
 
     print('sending', sql_string)
     cur = conn.cursor()
@@ -40,13 +47,17 @@ def main():
     # create four insert statements in parallel for optimisation
     # Create our 4 processes
     if len(df_list) < 4:
-        execute_values(conn1, df_list[0], 'MOCKDATA')
+        execute_values(conn1, df_list[0], 'new_file')
 
     else:
-        p1 = multiprocessing.Process(target=execute_values, args=(DB, USER, PASSWORD, SERVER, PORT, df_list[0], 'MOCKDATA'))
-        p2 = multiprocessing.Process(target=execute_values, args=(DB, USER, PASSWORD, SERVER, PORT, df_list[1], 'MOCKDATA'))
-        p3 = multiprocessing.Process(target=execute_values, args=(DB, USER, PASSWORD, SERVER, PORT, df_list[2], 'MOCKDATA'))
-        p4 = multiprocessing.Process(target=execute_values, args=(DB, USER, PASSWORD, SERVER, PORT, df_list[3], 'MOCKDATA'))
+        p1 = multiprocessing.Process(target=execute_values,
+                                     args=(DB, USER, PASSWORD, SERVER, PORT, df_list[0], TABLE_NAME))
+        p2 = multiprocessing.Process(target=execute_values,
+                                     args=(DB, USER, PASSWORD, SERVER, PORT, df_list[1], TABLE_NAME))
+        p3 = multiprocessing.Process(target=execute_values,
+                                     args=(DB, USER, PASSWORD, SERVER, PORT, df_list[2], TABLE_NAME))
+        p4 = multiprocessing.Process(target=execute_values,
+                                     args=(DB, USER, PASSWORD, SERVER, PORT, df_list[3], TABLE_NAME))
         # Start all the processes
         p1.start()
         p2.start()
@@ -63,8 +74,6 @@ def main():
     conn2.close()
     conn3.close()
     conn4.close()
-
-
 
 
 if __name__ == '__main__':
