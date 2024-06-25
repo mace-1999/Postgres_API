@@ -107,6 +107,7 @@ def get_number_records(dbname, user, password, host, port, table):
     try:
         cursor.execute(f'SELECT COUNT(*) FROM {table}')
         result = cursor.fetchone()
+        print(result)
 
 
     except psycopg2.DatabaseError as error:

@@ -5,7 +5,7 @@ import psycopg2
 
 import app.db_connection
 from app.db_connection import connect_to_db, open_and_return_csv, \
-    create_table_sql_from_postgres, split_df_into_four, execute_values
+    create_table_sql_from_postgres, split_df_into_four, execute_values, get_number_records
 from psycopg2 import OperationalError, DatabaseError, connect
 from unittest.mock import patch, MagicMock
 
@@ -95,7 +95,7 @@ class TestConnector(unittest.TestCase):
 
     @patch('app.db_connection.connect_to_db')
     @patch('app.db_connection.extras')
-    def test_postgres_insert_error(self , mock_extras, mock_connect):
+    def test_postgres_insert_error(self, mock_extras, mock_connect):
         '''
         Test postgres insert statement
         '''
@@ -104,11 +104,20 @@ class TestConnector(unittest.TestCase):
         mock_connect.return_value = MagicMock()
         mock_connect.return_value.commit.side_effect = DatabaseError('Mock Error!')
 
-
-
-
-        res = execute_values('dbname', 'user', 'password', 'host', 'port', pd.DataFrame({'One': [1, 2, 3, 4], 'Two': [4, 5, 6, 7]}), 'test')
+        res = execute_values('dbname', 'user', 'password', 'host', 'port',
+                             pd.DataFrame({'One': [1, 2, 3, 4], 'Two': [4, 5, 6, 7]}), 'test')
         self.assertEqual(res, False)
+
+    @patch('app.db_connection.connect_to_db')
+    def test_calculate_table_count(self, mock_connect):
+        '''
+        Test calculating rows in a postgres table
+        '''
+        mock_connect.return_value = MagicMock()
+        mock_connect.return_value.cursor.return_value.fetchone.return_value = (1000,)
+
+        self.assertEqual(get_number_records('dbname', 'user', 'password', 'host', 'port','test'),
+                         1000)
 
 
 
