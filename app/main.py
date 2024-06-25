@@ -4,7 +4,7 @@ Application to chunk a csv and upload the data using parralelisation for quicker
 import pandas as pd
 import multiprocessing
 from db_connection import connect_to_db, create_table_sql_from_postgres, split_df_into_four, \
-    execute_values
+    execute_values, get_number_records
 
 DB = 'devdb'
 USER = 'devuser'
@@ -15,7 +15,6 @@ PORT = '5432'
 FILEPATH = '../new_file.csv'
 # NAME TO CALL THE TABLE IN POSTGRES
 TABLE_NAME = 'new_file'
-
 
 # TODO: psycopg2.errors.DuplicateTable: relation "test" already exists.
 # TODO: Update so db config is more dynamic.

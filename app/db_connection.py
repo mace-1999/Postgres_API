@@ -75,9 +75,9 @@ def split_df_into_four(df: pd.DataFrame) -> list:
 
     return list_of_dfs
 
+
 # https://www.geeksforgeeks.org/how-to-insert-a-pandas-dataframe-to-an-existing-postgresql-table/
 def execute_values(dbname, user, password, host, port, df, table):
-
     conn = connect_to_db(dbname, user, password, host, port)
     tuples = [tuple(row) for row in df.itertuples(index=False)]
     cols = ','.join(list(df.columns))
@@ -96,4 +96,24 @@ def execute_values(dbname, user, password, host, port, df, table):
     print("the dataframe is inserted")
     cursor.close()
     return True
+
+
+def get_number_records(dbname, user, password, host, port, table):
+    '''
+    Get the number of records within the table
+    '''
+    conn = connect_to_db(dbname, user, password, host, port)
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f'SELECT COUNT(*) FROM {table}')
+        result = cursor.fetchone()
+
+
+    except psycopg2.DatabaseError as error:
+        print("Error: %s" % error)
+        cursor.close()
+        return False
+    cursor.close()
+    print(f'Database contains {result[0]} records.')
+    return result[0]
 
