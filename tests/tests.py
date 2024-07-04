@@ -116,9 +116,8 @@ class TestConnector(unittest.TestCase):
         mock_connect.return_value = MagicMock()
         mock_connect.return_value.cursor.return_value.fetchone.return_value = (1000,)
 
-        self.assertEqual(get_number_records('dbname', 'user', 'password', 'host', 'port','test'),
+        self.assertEqual(get_number_records('dbname', 'user', 'password', 'host', 'port', 'test'),
                          1000)
-
 
 
 if __name__ == '__main__':
