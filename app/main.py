@@ -6,18 +6,19 @@ import multiprocessing
 from db_connection import connect_to_db, create_table_sql_from_postgres, split_df_into_four, \
     execute_values, get_number_records
 
-DB = 'devdb'
-USER = 'devuser'
-PASSWORD = 'changeme'
-SERVER = 'localhost'
-PORT = '5432'
+from config import *
+
+DB = DB
+USER = USER
+PASSWORD = PASSWORD
+SERVER = SERVER
+PORT = PORT
 # FILE PATH OF CSV TO BE INSERTED TO POSTGRES
-FILEPATH = '../new_file.csv'
+FILEPATH = FILEPATH
 # NAME TO CALL THE TABLE IN POSTGRES
-TABLE_NAME = 'new_file'
+TABLE_NAME = TABLE_NAME
 
 # TODO: psycopg2.errors.DuplicateTable: relation "test" already exists.
-# TODO: Update so db config is more dynamic.
 # TODO: create read functionality.
 
 def main():

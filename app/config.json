@@ -1,0 +1,9 @@
+{
+  "DB": "devdb",
+  "USER": "devuser",
+  "PASSWORD": "changeme",
+  "SERVER": "localhost",
+  "PORT": 5432,
+  "FILEPATH": "../new_file.csv",
+  "TABLE_NAME": "new_config"
+}
